@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysCityMapper">
+
+	<resultMap type="SysCity" id="SysCityResult">
+		<id     property="id"     column="id"     />
+		<result property="pid"   column="pid"   />
+		<result property="cityName"  column="cityname"   />
+		<result property="type"   column="type"   />
+	</resultMap>
+	
+	<sql id="selectCityVo">
+        select c.id, c.pid, c.cityname, c.type
+        from sys_city c
+    </sql>
+
+	<select id="selectCityList" parameterType="SysCity" resultMap="SysCityResult">
+		<include refid="selectCityVo"/>
+		where 1 = 1
+		<if test="pid != null and pid != 0">
+			AND pid = #{pid}
+		</if>
+		<if test="cityName != null and cityName != ''">
+			AND cityname like concat('%', #{cityname}, '%')
+		</if>
+		<if test="type != null and type != ''">
+			AND type = #{type}
+		</if>
+		<!-- 数据范围过滤 -->
+		${params.dataScope}
+		order by c.id
+	</select>
+
+    <select id="selectCityById" parameterType="SysCity" resultMap="SysCityResult">
+		select c.id, c.pid, c.cityname, c.type
+		from sys_city c
+		where id = #{cityId}
+	</select>
+
+</mapper> 

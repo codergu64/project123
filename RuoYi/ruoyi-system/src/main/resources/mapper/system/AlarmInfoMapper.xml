@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.AlarmInfoMapper">
+
+	<resultMap type="AlarmInfo" id="AlarmInfoResult">
+		<id     property="infoId"     column="info_id"     />
+		<result property="modelStatus"   column="model_status"   />
+		<result property="titleName"  column="title_name"   />
+		<result property="level"   column="level"   />
+		<result property="createUserId"   column="create_user_id"   />
+		<result property="modifyUserId"     column="modify_user_id"      />
+		<result property="alarmTime"      column="alarm_time"       />
+		<result property="content"      column="content"       />
+		<result property="createTime"     column="create_time"      />
+		<result property="modifyTime"    column="modify_time"    />
+		<result property="attr1" column="attr1" />
+		<result property="attr2"   column="attr2"   />
+		<result property="attr3" column="attr3" />
+		<result property="attr4"   column="attr4"   />
+		<result property="attr5" column="attr5" />
+	</resultMap>
+	
+	<sql id="selectAlarmInfoVO">
+        select ai.info_id, ai.model_status, ai.title_name, ai.level, ai.create_user_id, ai.modify_user_id, ai.alarm_time, ai.content, ai.create_time, ai.modify_time, ai.attr1, ai.attr2, ai.attr3, ai.attr4, ai.attr5
+        from alarm_info ai
+    </sql>
+
+	<select id="selectAlarmInfoList" resultMap="AlarmInfoResult">
+		<include refid="selectAlarmInfoVO"/>
+		where ai.model_status = 0
+		<if test="titleName != null and titleName != ''"> and ai.title_name like concat('%', #{titleName}, '%')</if>
+		<if test="level != null and level != ''"> and ai.level = #{level}</if>
+		<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+			AND date_format(ai.create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+		</if>
+		<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+			AND date_format(ai.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+		</if>
+	</select>
+
+	<select id="selectWeatherRiskList" resultMap="AlarmInfoResult">
+		<include refid="selectAlarmInfoVO"/>
+		where ai.model_status = 1
+		<if test="titleName != null and titleName != ''"> and ai.title_name like concat('%', #{titleName}, '%')</if>
+		<if test="level != null and level != ''"> and ai.level = #{level}</if>
+		<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+			AND date_format(ai.create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+		</if>
+		<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+			AND date_format(ai.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+		</if>
+	</select>
+
+	<select id="selectFireRiskList" resultMap="AlarmInfoResult">
+		<include refid="selectAlarmInfoVO"/>
+		where ai.model_status = 2
+		<if test="titleName != null and titleName != ''"> and ai.title_name like concat('%', #{titleName}, '%')</if>
+		<if test="level != null and level != ''"> and ai.level = #{level}</if>
+		<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+			AND date_format(ai.create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+		</if>
+		<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+			AND date_format(ai.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+		</if>
+	</select>
+
+	<select id="selectFireProofList" resultMap="AlarmInfoResult">
+		<include refid="selectAlarmInfoVO"/>
+		where ai.model_status = 3
+		<if test="titleName != null and titleName != ''"> and ai.title_name like concat('%', #{titleName}, '%')</if>
+		<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+			AND date_format(ai.create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+		</if>
+		<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+			AND date_format(ai.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+		</if>
+	</select>
+
+	<select id="selectFireCommunicationList" resultMap="AlarmInfoResult">
+		<include refid="selectAlarmInfoVO"/>
+		where ai.model_status = 4
+		<if test="titleName != null and titleName != ''"> and ai.title_name like concat('%', #{titleName}, '%')</if>
+		<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+			AND date_format(ai.create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+		</if>
+		<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+			AND date_format(ai.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+		</if>
+	</select>
+
+	<insert id="insertAlarmInfo" parameterType="AlarmInfo" useGeneratedKeys="true" keyProperty="infoId">
+		insert into alarm_info(
+			<if test="modelStatus != null and modelStatus != ''">model_status,</if>
+			<if test="titleName != null and titleName != ''">title_name,</if>
+			<if test="level != null and level != ''">level,</if>
+			<if test="createUserId != null and createUserId != ''">create_user_id,</if>
+			<if test="modifyUserId != null and modifyUserId != ''">modify_user_id,</if>
+			alarm_time,
+			<if test="content != null and content != ''">content,</if>
+			<if test="attr1 != null and attr1 != ''">attr1,</if>
+			<if test="attr2 != null and attr2 != ''">attr2,</if>
+			<if test="attr3 != null and attr3 != ''">attr3,</if>
+			<if test="attr4 != null and attr4 != ''">attr4,</if>
+			<if test="attr5 != null and attr5 != ''">attr5,</if>
+			create_time
+		)values(
+			<if test="modelStatus != null and modelStatus != ''">#{modelStatus},</if>
+			<if test="titleName != null and titleName != ''">#{titleName},</if>
+			<if test="level != null and level != ''">#{level},</if>
+			<if test="createUserId != null and createUserId != ''">#{createUserId},</if>
+			<if test="modifyUserId != null and modifyUserId != ''">#{modifyUserId},</if>
+			#{alarmTime},
+			<if test="content != null and content != ''">#{content},</if>
+			<if test="attr1 != null and attr1 != ''">#{attr1},</if>
+			<if test="attr2 != null and attr2 != ''">#{attr2},</if>
+			<if test="attr3 != null and attr3 != ''">#{attr3},</if>
+			<if test="attr4 != null and attr4 != ''">#{attr4},</if>
+			<if test="attr5 != null and attr5 != ''">#{attr5},</if>
+			sysdate()
+		)
+	</insert>
+
+	<delete id="deleteAlarmInfo">
+		delete from alarm_info
+		where info_id in
+		<foreach collection="array" item="infoId" open="(" separator="," close=")">
+			#{infoId}
+		</foreach>
+	</delete>
+
+
+</mapper> 

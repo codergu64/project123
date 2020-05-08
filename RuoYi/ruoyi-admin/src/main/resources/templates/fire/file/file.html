@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('经验交流')" />
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content" id="app">
+		<div class="row main-box" style="padding-top: 10px">
+			<div class="col-sm-10 animated fadeInRight" style="max-height: calc(100vh - 95px); overflow-y: auto;">
+				<div class="row" style="margin-bottom: 10px">
+					<!--<div class="col-sm-12">
+						<Modal v-model="isshowmodal" @on-cancel="cancel" width="auto" :styles="{top: '0px'}">
+							<div style="max-width: 100%;overflow-x: auto;text-align: center;">
+								<img :src="imgurl" v-if="fileType===0">
+								<video :src="imgurl" controls autoplay v-else></video>
+							</div>
+							<small>{{imgName}}</small>
+						</Modal>
+					</div>-->
+					<div class="col-sm-12">
+						<div class="file-box" v-for="row in rows">
+							<div v-show="row.type===0" class="file">
+								<a href="#">
+									<span class="corner"></span>
+									<img alt="image" class="img-responsive" :src="row.url" style="height: 135px;">
+									<div class="file-name">
+										<small>{{row.name}}</small>
+									</div>
+
+									<i-button type="warning" size="small" @click="openmodal(row.url,row.name,row.type)" style="margin-left:13px">预览</i-button>
+									<i-button type="success" size="small" style="margin-left:13px" @click="download(row.id)">下载</i-button>
+									<i-button @click="remove(row.id)" type="error" size="small" style="margin-left:13px" shiro:hasPermission="nsmp:circularList:remove">删除</i-button>
+								</a>
+							</div>
+							<div v-show="row.type===2" class="file">
+								<a href="#">
+									<span class="corner"></span>
+									<video id="media" :src="row.url" controls width="100%" style="height: 135px;"></video>
+									<div class="file-name">
+										<small>{{row.name}}</small>
+									</div>
+									<i-button type="warning" size="small" @click="openmodal(row.url,row.name,row.type)"
+											  style="margin-left:13px">预览
+									</i-button>
+									<i-button type="success" size="small" style="margin-left: 13px;"
+											  @click="download(row.id)">下载
+									</i-button>
+									<i-button @click="remove(row.id)" type="error" size="small" style="margin-left: 13px;"
+											  shiro:hasPermission="nsmp:circularList:remove">删除
+									</i-button>
+								</a>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-12">
+						<div v-show="rows.length>0 && rows[0].type===1" style="border: 1px solid #dcdee2 ">
+							<i-table :columns="list" :data="rows"></i-table>
+						</div>
+					</div>
+					<div class="col-sm-12">
+						<div v-show="rows.length>0 && rows[0].type===99" style="border: 1px solid #dcdee2 ">
+							<i-table :columns="otherData" :data="rows"></i-table>
+						</div>
+					</div>
+				</div>
+				<Page v-if="total>9" :total="total" show-elevator show-total @on-change="fenye" page-size="9" />
+			</div>
+		</div>
+	</div>
+	<script>
+		var app = new Vue({
+			el: '#app',
+			data: {
+				limit: 9,
+				offset: 0,
+				total: 0,
+				file: '',
+				type: '',
+				fileType: 0,
+				rows: [],
+				isshowmodal: false,
+				imgurl: "",
+				imgName: "",
+				list: [
+					{
+						title: '序号',
+						key: 'indexa',
+						align: 'center',
+						width: 80,
+						render: (h, params) => {
+						let i = app.offset +params.index+1
+						return h('div',i)
+					}
+			},
+		/* {
+             title: 'ID',
+             key: 'id',
+             align: 'center'
+         },*/
+		{
+			title: '文件名',
+					key: 'name',
+				align: 'center',
+		},
+		{
+			title: '上传时间',
+					key: 'createDate',
+				align: 'center'
+		},
+		{
+			title: '操作',
+					key: 'caozuo',
+				align: 'center',
+				render: (h, params) => {
+			return h('div', [
+				h('a', {
+					/* props: {
+                         type: 'success',
+                         size: 'small',
+                     },*/
+					style: {
+						color:'#00b7ee',
+						marginRight: '10px'
+					},
+					on: {
+						click: () => {
+						app.download(params.row.id)
+					}
+				}
+
+		}, '下载'),
+			h('a', {
+				/*props: {
+                    type: 'error',
+                    size: 'small'
+                },*/
+				style: {
+					color:'#00b7ee',
+					display:s_remove
+				},
+				on: {
+					click: () => {
+					app.remove(params.row.id)
+				}
+			}
+		}, '删除')
+
+		])
+		}
+		}
+		],
+		otherData:[
+			{
+				title: '序号',
+				key: 'operation',
+				align: 'center',
+				width: 80,
+				render: (h, params) => {
+				let i = app.offset +params.index+1
+				return h('div',i)
+			}
+		},
+		/*  {
+              title: 'ID',
+              key: 'id',
+              align: 'center'
+          },*/
+		{
+			title: '文件名',
+					key: 'name',
+				align: 'center',
+		},
+		{
+			title: '上传时间',
+					key: 'createDate',
+				align: 'center'
+		},
+		{
+			title: '操作',
+					key: 'operation',
+				align: 'center',
+				render: (h, params) => {
+			return h('div', [
+				h('a', {
+					/* props: {
+                         type: 'success',
+                         size: 'small',
+                     },*/
+					style: {
+						color:'#00b7ee',
+						marginRight: '10px',
+					},
+					on: {
+						click: () => {
+						app.download(params.row.id)
+					}
+				},
+
+		}, '下载'),
+			h('a', {
+				/*   props: {
+                       type: 'error',
+                       size: 'small'
+                   },*/
+				style: {
+					color:'#00b7ee',
+					display:s_remove
+				},
+				on: {
+					click: () => {
+					app.remove(params.row.id)
+				}
+			}
+		}, '删除')
+
+		])
+		}
+		}
+		],
+		},
+		methods: {
+			//下载视频
+			download(id){
+				location.href = "/common/sysFile/download?id=" + id;
+				/* $.ajax({
+                     url: "/common/sysFile/download",
+                     type: "get",
+                     responseType: 'blob',  //这个不能少,让response二进制形式,如果你按照网上教程不设置这个将返回值进行BLOB([])进行处理可能会出现解析错误
+                     data: {
+                         'id': id
+                     },
+                     success: function (res) {
+                         if (res.code == 500) {
+                             layer.msg('视频下载异常');
+                         } else {
+                             const href = URL.createObjectURL(response.data); //根据二进制对象创造新的链接
+                             const a = document.createElement('a');
+                             a.setAttribute('href', href);
+                             a.setAttribute('download', row.title);
+                             a.click();
+                             URL.revokeObjectURL(href);
+                         }
+                     }
+                 });*/
+			},
+			openmodal(imgurl,imgName,type) {
+				app.isshowmodal = true;
+				app.imgurl = imgurl;
+				app.imgName = imgName;
+				app.fileType = type;
+			},
+			cancel() {
+				app.isshowmodal = false
+			},
+			fenye(page) {
+				app.offset = (page - 1) * 9;
+				app.getData();
+			},
+			//获取不同类型的数据
+			getData() {
+				$.getJSON("/common/sysFile/list", {
+					limit: this.limit,
+					offset: this.offset,
+					type: this.type,
+					flag:0
+				}, function (r) {
+					app.total = r.total;
+					app.rows = r.rows;
+					app.page();
+				});
+			},
+			page: function () {
+				var options = {
+					currentPage: app.offset / 9 + 1, //当前页   12
+					totalPages: app.total / (9 + 1) + 1, //总页数   12
+					numberofPages: 4, //显示的页数
+					bootstrapMajorVersion: 3,
+					alignment: 'center',
+					size: 'large',
+					shouldShowPage: true,
+					itemTexts: function (type, page, current) { //修改显示文字
+						switch (type) {
+							case "first":
+								return "首页";
+							case "prev":
+								return "上一页";
+							case "next":
+								return "下一页";
+							case "last":
+								return "尾页";
+							case "page":
+								return page;
+						}
+					},
+					onPageClicked: function (event, originalEvent, type, page) {
+						app.offset = (page - 1) * 9;
+						app.getData();
+					}
+				};
+				$('#page').bootstrapPaginator(options);
+			},
+			remove: function (id) {
+				layer.confirm('确定要删除选中的记录？', {
+					btn: ['确定', '取消']
+				}, function () {
+					$.ajax({
+						url: "/common/sysFile/remove",
+						type: "post",
+						data: {
+							'id': id
+						},
+						success: function (r) {
+							if (r.code == 0) {
+								layer.msg(r.msg);
+								app.getData();
+							} else {
+								layer.msg(r.msg);
+								app.getData();
+							}
+						}
+					});
+				})
+			},
+			changeType: function (i) {
+				this.type = i;
+				this.offset = 0;
+				this.getData();
+			}
+		},
+		created: function () {
+			this.changeType(1)
+		}
+
+
+		});
+	</script>
+</body>
+</html>
